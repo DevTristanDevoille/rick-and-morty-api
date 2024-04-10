@@ -32,6 +32,9 @@ internal class EpisodeRepositoryImpl (
         val objects = response.map(transform = EpisodeResponse::toRealmObject)
 
         episodeLocal.saveEpisodes(objects)
-
     }
+
+    override suspend fun getEpisodeById(episodeId: Int): Episode =
+        episodeApi.getEpisodeById(episodeId)
+
 }
