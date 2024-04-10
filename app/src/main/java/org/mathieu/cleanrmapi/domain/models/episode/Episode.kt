@@ -1,7 +1,9 @@
-package org.mathieu.cleanrmapi.domain.models.character
+package org.mathieu.cleanrmapi.domain.models.episode
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import org.mathieu.cleanrmapi.domain.models.episode.Episode
+import kotlinx.serialization.json.JsonNames
+import org.mathieu.cleanrmapi.domain.models.character.Character
 
 /**
  * Represents a detailed characterization, typically derived from a data source or API.
@@ -17,29 +19,12 @@ import org.mathieu.cleanrmapi.domain.models.episode.Episode
  * @property avatarUrl A URL pointing to an avatar or image of the character.
  */
 @Serializable
-data class Character(
+data class Episode (
     val id: Int,
     val name: String,
-    val status: CharacterStatus,
-    val species: String,
-    val type: String,
-    val gender: CharacterGender,
-    val origin: Pair<String, Int>,
-    val location: Pair<String, Int>,
-    val avatarUrl: String,
-    val episode: List<String>
+    val airDate: String,
+    val episode: String,
+    val characters: List<String>,
+    val url: String,
+    val created: String
 )
-
-/**
- * Describes the current state or condition of a character.
- */
-enum class CharacterStatus {
-    Alive, Dead, Unknown
-}
-
-/**
- * Represents the gender classification of a character.
- */
-enum class CharacterGender {
-    Female, Male, Genderless, Unknown
-}

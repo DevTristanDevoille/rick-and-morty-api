@@ -7,6 +7,7 @@ import io.ktor.client.request.parameter
 import io.ktor.http.HttpStatusCode
 import org.mathieu.cleanrmapi.data.remote.responses.CharacterResponse
 import org.mathieu.cleanrmapi.data.remote.responses.PaginatedResponse
+import org.mathieu.cleanrmapi.domain.models.episode.Episode
 
 internal class CharacterApi(private val client: HttpClient) {
 

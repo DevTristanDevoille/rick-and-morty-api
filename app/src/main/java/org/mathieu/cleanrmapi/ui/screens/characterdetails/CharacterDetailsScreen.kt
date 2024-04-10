@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -41,8 +44,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
+import org.mathieu.cleanrmapi.domain.models.episode.Episode
 import org.mathieu.cleanrmapi.ui.core.composables.PreviewContent
 import org.mathieu.cleanrmapi.ui.core.theme.Purple40
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import org.mathieu.cleanrmapi.ui.core.Destination
+import org.mathieu.cleanrmapi.ui.core.navigate
 
 private typealias UIState = CharacterDetailsState
 
@@ -54,10 +64,19 @@ fun CharacterDetailsScreen(
     val viewModel: CharacterDetailsViewModel = viewModel()
     val state by viewModel.state.collectAsState()
 
+    LaunchedEffect(viewModel) {
+        viewModel.events
+            .onEach { event ->
+                if (event is Destination.EpisodeDetails)
+                    navController.navigate(destination = event)
+            }.collect()
+    }
+
     viewModel.init(characterId = id)
 
     CharacterDetailsContent(
         state = state,
+        onAction = viewModel::handleAction,
         onClickBack = navController::popBackStack
     )
 
@@ -68,6 +87,7 @@ fun CharacterDetailsScreen(
 @Composable
 private fun CharacterDetailsContent(
     state: UIState = UIState(),
+    onAction: EpisodeAction,
     onClickBack: () -> Unit = { }
 ) = Scaffold(topBar = {
 
@@ -140,8 +160,26 @@ private fun CharacterDetailsContent(
 
                 }
 
+                /*LazyColumn (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    items(state.episodes) {
+                        EpisodeCard(
+                            modifier = Modifier
+                                .padding(8.dp),
+                            episode = it
+                        )
+                    }
+                }*/
+
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     SubcomposeAsyncImage(
@@ -157,10 +195,31 @@ private fun CharacterDetailsContent(
 
                     Text(text = state.name)
                 }
-
-
             }
         }
+    }
+}
+
+@Composable
+private fun EpisodeCard(
+    modifier: Modifier, episode: Episode
+){
+    Row(
+        modifier = modifier
+            .shadow(5.dp)
+            .background(Color.White)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+        ,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Text(text = episode.airDate)
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(text = episode.episode + " - " + episode.name)
+
     }
 }
 
