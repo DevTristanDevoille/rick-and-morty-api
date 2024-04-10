@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,7 +48,6 @@ import coil.compose.SubcomposeAsyncImage
 import org.mathieu.cleanrmapi.domain.models.episode.Episode
 import org.mathieu.cleanrmapi.ui.core.composables.PreviewContent
 import org.mathieu.cleanrmapi.ui.core.theme.Purple40
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
@@ -55,6 +55,7 @@ import org.mathieu.cleanrmapi.ui.core.Destination
 import org.mathieu.cleanrmapi.ui.core.navigate
 
 private typealias UIState = CharacterDetailsState
+private typealias UIAction = CharacterAction
 
 @Composable
 fun CharacterDetailsScreen(
@@ -87,7 +88,7 @@ fun CharacterDetailsScreen(
 @Composable
 private fun CharacterDetailsContent(
     state: UIState = UIState(),
-    onAction: EpisodeAction,
+    onAction: (UIAction) -> Unit = { },
     onClickBack: () -> Unit = { }
 ) = Scaffold(topBar = {
 
@@ -160,22 +161,6 @@ private fun CharacterDetailsContent(
 
                 }
 
-                /*LazyColumn (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-
-                    items(state.episodes) {
-                        EpisodeCard(
-                            modifier = Modifier
-                                .padding(8.dp),
-                            episode = it
-                        )
-                    }
-                }*/
-
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -195,6 +180,25 @@ private fun CharacterDetailsContent(
 
                     Text(text = state.name)
                 }
+
+                LazyColumn (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    items(state.episodes) {
+                        EpisodeCard(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    onAction(CharacterAction.SelectedEpisode(it))
+                                },
+                            episode = it
+                        )
+                    }
+                }
             }
         }
     }
@@ -204,22 +208,31 @@ private fun CharacterDetailsContent(
 private fun EpisodeCard(
     modifier: Modifier, episode: Episode
 ){
-    Row(
+
+    Column (
         modifier = modifier
-            .shadow(5.dp)
-            .background(Color.White)
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp)
         ,
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.Center
     ) {
 
-        Text(text = episode.airDate)
+    }
 
-        Spacer(modifier = Modifier.width(12.dp))
+    Row (
+        modifier = modifier
+            .shadow(5.dp)
+            .background(Color.White)
+    ){
+        Text(text = episode.air_date)
+    }
 
+    Row (
+        modifier = modifier
+            .shadow(5.dp)
+            .background(Color.White)
+    ){
         Text(text = episode.episode + " - " + episode.name)
-
     }
 }
 

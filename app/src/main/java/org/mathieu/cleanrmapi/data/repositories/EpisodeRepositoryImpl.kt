@@ -27,6 +27,8 @@ internal class EpisodeRepositoryImpl (
 
         val response = episodeApi.getAllEpisode(episodes)
 
+        episodeLocal.deleteEpisodes()
+
         val objects = response.map(transform = EpisodeResponse::toRealmObject)
 
         episodeLocal.saveEpisodes(objects)

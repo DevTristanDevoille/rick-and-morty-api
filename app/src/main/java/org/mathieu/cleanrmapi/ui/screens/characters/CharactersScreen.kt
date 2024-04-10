@@ -115,7 +115,6 @@ private fun CharactersContent(
                         character = it
                     )
                 }
-
             }
         }
     }

@@ -12,12 +12,23 @@ internal class EpisodeLocal(private val database: RealmDatabase) {
         query<EpisodeObject>().find().asFlow().map { it.list }
     }
 
+    suspend fun getEpisodes(ids: ArrayList<String>): Flow<List<EpisodeObject>> = database.use {
+        val queryValues = ids.joinToString(separator = ",", prefix = "{", postfix = "}")
+        query<EpisodeObject>("id IN $queryValues").find().asFlow().map { it.list }
+    }
+
     suspend fun getEpisode(id: Int): EpisodeObject? = database.use {
         query<EpisodeObject>("id == $id").first().find()
     }
 
     suspend fun saveEpisodes(episodes: List<EpisodeObject>) = episodes.onEach {
         insert(it)
+    }
+
+    suspend fun deleteEpisodes() = database.write {
+        val episodes = query<EpisodeObject>().find()
+        // Pass the query results to delete()
+        delete(episodes)
     }
 
     suspend fun insert(episode: EpisodeObject) {

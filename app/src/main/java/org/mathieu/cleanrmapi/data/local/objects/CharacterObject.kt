@@ -44,8 +44,7 @@ internal class CharacterObject: RealmObject {
     var locationId: Int = -1
     var image: String = ""
     var created: String = ""
-    @Ignore
-    var episodes: List<String> = listOf()
+    var episodes: RealmList<String> = realmListOf()
 }
 
 
@@ -62,7 +61,7 @@ internal fun CharacterResponse.toRealmObject() = CharacterObject().also { obj ->
     obj.locationId = tryOrNull { location.url.split("/").last().toInt() } ?: -1
     obj.image = image
     obj.created = created
-    obj.episodes = episode
+    obj.episodes.addAll(episode)
 }
 
 internal fun CharacterObject.toModel() = Character(

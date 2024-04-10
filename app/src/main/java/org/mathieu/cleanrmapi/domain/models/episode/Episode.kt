@@ -1,9 +1,6 @@
 package org.mathieu.cleanrmapi.domain.models.episode
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonNames
-import org.mathieu.cleanrmapi.domain.models.character.Character
 
 /**
  * Represents a detailed characterization, typically derived from a data source or API.
@@ -22,7 +19,7 @@ import org.mathieu.cleanrmapi.domain.models.character.Character
 data class Episode (
     val id: Int,
     val name: String,
-    val airDate: String,
+    val air_date: String,
     val episode: String,
     val characters: List<String>,
     val url: String,

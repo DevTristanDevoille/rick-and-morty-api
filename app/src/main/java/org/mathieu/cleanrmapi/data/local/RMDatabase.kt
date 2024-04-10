@@ -14,7 +14,7 @@ internal class RMDatabase : RealmDatabase(
         CharacterObject::class,
         EpisodeObject::class
     ),
-    1
+    2
 )
 
 open class RealmDatabase(name: String, schema: Set<KClass<out TypedRealmObject>>, schemaVersion: Long) {

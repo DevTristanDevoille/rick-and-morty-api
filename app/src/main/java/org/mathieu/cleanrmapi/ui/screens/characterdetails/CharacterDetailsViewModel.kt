@@ -13,15 +13,14 @@ import org.mathieu.cleanrmapi.ui.core.Destination
 import org.mathieu.cleanrmapi.ui.core.ViewModel
 import org.mathieu.cleanrmapi.ui.screens.characters.CharactersAction
 
-sealed interface EpisodeAction {
-    data class SelectedEpisode(val episode: Episode): EpisodeAction
+sealed interface CharacterAction {
+    data class SelectedEpisode(val episode: Episode): CharacterAction
 }
 
 class CharacterDetailsViewModel(application: Application) : ViewModel<CharacterDetailsState>(CharacterDetailsState(), application) {
 
     private val characterRepository: CharacterRepository by inject()
     private val episodeRepository: EpisodeRepository by inject()
-    private lateinit var character : Character
 
     fun init(characterId: Int) {
         fetchData(
@@ -29,8 +28,7 @@ class CharacterDetailsViewModel(application: Application) : ViewModel<CharacterD
         ) {
 
             onSuccess {
-                character = it
-                updateState { copy(avatarUrl = it.avatarUrl, name = it.name, error = null) }
+                updateState { copy(avatarUrl = it.avatarUrl, name = it.name, error = null, character = it) }
                 getAllEpisode()
             }
 
@@ -42,9 +40,9 @@ class CharacterDetailsViewModel(application: Application) : ViewModel<CharacterD
         }
     }
 
-    fun handleAction(action: EpisodeAction) {
+    fun handleAction(action: CharacterAction) {
         when(action) {
-            is EpisodeAction.SelectedEpisode -> selectedEpisode(action.episode)
+            is CharacterAction.SelectedEpisode -> selectedEpisode(action.episode)
         }
     }
 
@@ -53,35 +51,34 @@ class CharacterDetailsViewModel(application: Application) : ViewModel<CharacterD
         sendEvent(Destination.EpisodeDetails(episode.id.toString()))
     }
 
-    fun getAllEpisode(){
+    private fun getAllEpisode(){
         val episodes = ArrayList<String>()
 
-        character.episode.forEach {
+        updateState { copy(episodes = emptyList()) }
+
+        state.value.character!!.episode.forEach {
             episodes.add(it.replace("https://rickandmortyapi.com/api/episode/",""))
         }
 
-        Log.e("Test",episodes.toString())
+        if (episodes.size != 0){
+            viewModelScope.launch {
+                collectData(
+                    source = { episodeRepository.getEpisode(episodes) }
+                ) {
+                    onSuccess {
+                        updateState { copy(episodes = emptyList(), error = null) }
+                        updateState { copy(episodes = it.sortedBy { it.id }, error = null) }
+                    }
 
-        viewModelScope.launch {
-            collectData(
-                source = { episodeRepository.getEpisode(episodes) }
-            ) {
+                    onFailure {
+                        updateState { copy(episodes = emptyList(), error = it.toString()) }
+                    }
 
-                onSuccess {
-                    updateState { copy(episodes = it, error = null) }
+                    updateState { copy(isLoading = false) }
                 }
-
-                onFailure {
-                    updateState { copy(episodes = emptyList(), error = it.toString()) }
-                }
-
-                updateState { copy(isLoading = false) }
             }
         }
-
     }
-
-
 }
 
 
@@ -90,5 +87,6 @@ data class CharacterDetailsState(
     val avatarUrl: String = "",
     val name: String = "",
     val error: String? = null,
+    val character: Character? = null,
     val episodes: List<Episode> = emptyList()
 )
